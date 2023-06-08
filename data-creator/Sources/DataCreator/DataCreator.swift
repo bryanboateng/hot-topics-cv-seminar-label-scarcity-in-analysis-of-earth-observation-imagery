@@ -21,7 +21,7 @@ struct DataCreator: ParsableCommand {
 	func run() {
 		//		groupAndReorganizeImagesByDamage(subset: "hold")
 		groupAndReorganizeImagesByDamage(subset: "test")
-		groupAndReorganizeImagesByDamage(subset: "train")
+//		groupAndReorganizeImagesByDamage(subset: "train")
 	}
 
 	func groupAndReorganizeImagesByDamage(subset: String) {
@@ -63,29 +63,26 @@ struct DataCreator: ParsableCommand {
 		let features = json["features"] as! [String: [[String: Any]]]
 		let lngLatFeatures = features["lng_lat"]!
 		guard !lngLatFeatures.isEmpty else { return 0 }
-		//		lngLatFeatures.compactMap { feature in
-		//			<#code#>
-		//		}
-		let averageDamageLevel: Float = lngLatFeatures.reduce(0.0) { partialResult, feature in
+		let damageLevels = lngLatFeatures.compactMap { (feature: [String: Any]) -> Int? in
 			let properties = feature["properties"] as! [String: String]
-			let numericDamageLevel = {
-				switch properties["subtype"] {
-				case "un-classified":
-					return 0
-				case "no-damage":
-					return 1
-				case "minor-damage":
-					return 2
-				case "major-damage":
-					return 3
-				case "destroyed":
-					return 4
-				default:
-					fatalError("Unknown subtype")
-				}
-			}()
-			return partialResult + Float(numericDamageLevel)
-		} / Float(lngLatFeatures.count)
-		return Int(averageDamageLevel.rounded())
+			switch properties["subtype"] {
+			case "un-classified":
+				return nil
+			case "no-damage":
+				return 1
+			case "minor-damage":
+				return 2
+			case "major-damage":
+				return 3
+			case "destroyed":
+				return 4
+			default:
+				fatalError("Unknown subtype")
+			}
+		}
+		guard !damageLevels.isEmpty else { return 0}
+		return Int(
+			(Double(damageLevels.reduce(0, +)) / Double(damageLevels.count)).rounded()
+		)
 	}
 }
