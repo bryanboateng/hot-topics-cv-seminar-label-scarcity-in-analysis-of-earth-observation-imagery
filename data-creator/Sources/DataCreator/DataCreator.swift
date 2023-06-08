@@ -26,14 +26,14 @@ struct DataCreator: ParsableCommand {
 
 	func groupAndReorganizeImagesByDamage(subset: String) {
 		let fileManager = FileManager.default
-		let subsetDirectory = dataDirectory.appendingPathComponent(subset)
+		let subsetDirectory = dataDirectory.appendingPathComponent(subset, isDirectory: true)
 		let labelDirectory = subsetDirectory.appendingPathComponent("labels", isDirectory: true)
 		let groupedDataDirectory = dataDirectory
 			.appendingPathComponent("..", isDirectory: true)
 			.appendingPathComponent("grouped-data", isDirectory: true)
 		let imageDirectory = subsetDirectory.appendingPathComponent("images", isDirectory: true)
-		for labelFile in try! fileManager.contentsOfDirectory(atPath: labelDirectory.absoluteString) {
-			let damage = calculateDamageLevel(from: labelDirectory.appendingPathComponent(labelFile).absoluteString)
+		for labelFile in try! fileManager.contentsOfDirectory(atPath: labelDirectory.path) {
+			let damage = calculateDamageLevel(from: labelDirectory.appendingPathComponent(labelFile).path)
 			let imageCopyDirectory = groupedDataDirectory
 				.appendingPathComponent(subset, isDirectory: true)
 				.appendingPathComponent(String(damage), isDirectory: true)
