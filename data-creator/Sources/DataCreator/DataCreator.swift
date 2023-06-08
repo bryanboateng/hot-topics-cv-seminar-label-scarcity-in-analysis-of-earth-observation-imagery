@@ -19,9 +19,9 @@ struct DataCreator: ParsableCommand {
 	}
 
 	func run() {
-//		groupAndReorganizeImagesByDamage(subset: "hold")
+		//		groupAndReorganizeImagesByDamage(subset: "hold")
 		groupAndReorganizeImagesByDamage(subset: "test")
-		groupAndReorganizeImagesByDamage(subset: "train")
+		//		groupAndReorganizeImagesByDamage(subset: "train")
 	}
 
 	func groupAndReorganizeImagesByDamage(subset: String) {
@@ -33,6 +33,7 @@ struct DataCreator: ParsableCommand {
 			.appendingPathComponent("grouped-data", isDirectory: true)
 		let imageDirectory = subsetDirectory.appendingPathComponent("images", isDirectory: true)
 		for labelFile in try! fileManager.contentsOfDirectory(atPath: labelDirectory.path) {
+			guard labelFile.contains("_post") else { continue }
 			let damage = calculateDamageLevel(from: labelDirectory.appendingPathComponent(labelFile).path)
 			let imageCopyDirectory = groupedDataDirectory
 				.appendingPathComponent(subset, isDirectory: true)
@@ -45,7 +46,7 @@ struct DataCreator: ParsableCommand {
 			let imageFile = labelFileURL!
 				.deletingPathExtension()
 				.appendingPathExtension("png")
-				.absoluteString
+				.path
 			try! fileManager.copyItem(
 				at: imageDirectory.appendingPathComponent(imageFile),
 				to: imageCopyDirectory
@@ -62,6 +63,9 @@ struct DataCreator: ParsableCommand {
 		let features = json["features"] as! [String: [[String: Any]]]
 		let lngLatFeatures = features["lng_lat"]!
 		guard !lngLatFeatures.isEmpty else { return 0 }
+		//		lngLatFeatures.compactMap { feature in
+		//			<#code#>
+		//		}
 		let averageDamageLevel: Float = lngLatFeatures.reduce(0.0) { partialResult, feature in
 			let properties = feature["properties"] as! [String: String]
 			let numericDamageLevel = {
