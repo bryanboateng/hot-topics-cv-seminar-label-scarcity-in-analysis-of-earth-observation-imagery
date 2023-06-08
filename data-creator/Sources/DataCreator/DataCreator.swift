@@ -19,24 +19,24 @@ struct DataCreator: ParsableCommand {
 	}
 
 	func run() {
-		groupAndReorganizeImagesByDamage(subset: "hold")
+//		groupAndReorganizeImagesByDamage(subset: "hold")
 		groupAndReorganizeImagesByDamage(subset: "test")
 		groupAndReorganizeImagesByDamage(subset: "train")
 	}
 
 	func groupAndReorganizeImagesByDamage(subset: String) {
 		let fileManager = FileManager.default
-		let subsetDirectory = dataDirectory.appending(path: subset)
-		let labelDirectory = subsetDirectory.appending(path: "labels")
+		let subsetDirectory = dataDirectory.appendingPathComponent(subset)
+		let labelDirectory = subsetDirectory.appendingPathComponent("labels")
 		let groupedDataDirectory = dataDirectory
-			.appending(path: "..")
-			.appending(path: "grouped-data")
-		let imageDirectory = subsetDirectory.appending(path: "images")
-		for labelFile in try! fileManager.contentsOfDirectory(atPath: labelDirectory.path(percentEncoded: false)) {
-			let damage = calculateDamageLevel(from: labelDirectory.appending(path: labelFile).path(percentEncoded: false))
+			.appendingPathComponent("..")
+			.appendingPathComponent("grouped-data")
+		let imageDirectory = subsetDirectory.appendingPathComponent("images")
+		for labelFile in try! fileManager.contentsOfDirectory(atPath: labelDirectory.absoluteString) {
+			let damage = calculateDamageLevel(from: labelDirectory.appendingPathComponent(labelFile).absoluteString)
 			let imageCopyDirectory = groupedDataDirectory
-				.appending(path: subset)
-				.appending(path: String(damage))
+				.appendingPathComponent(subset)
+				.appendingPathComponent(String(damage))
 			try! fileManager.createDirectory(
 				at: imageCopyDirectory,
 				withIntermediateDirectories: true
@@ -45,11 +45,11 @@ struct DataCreator: ParsableCommand {
 			let imageFile = labelFileURL!
 				.deletingPathExtension()
 				.appendingPathExtension("png")
-				.path()
+				.absoluteString
 			try! fileManager.copyItem(
-				at: imageDirectory.appending(path: imageFile),
+				at: imageDirectory.appendingPathComponent(imageFile),
 				to: imageCopyDirectory
-					.appending(path: imageFile)
+					.appendingPathComponent(imageFile)
 			)
 		}
 	}
