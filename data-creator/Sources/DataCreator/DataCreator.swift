@@ -21,7 +21,7 @@ struct DataCreator: ParsableCommand {
 	func run() {
 		//		groupAndReorganizeImagesByDamage(subset: "hold")
 		groupAndReorganizeImagesByDamage(subset: "test")
-//		groupAndReorganizeImagesByDamage(subset: "train")
+		groupAndReorganizeImagesByDamage(subset: "train")
 	}
 
 	func groupAndReorganizeImagesByDamage(subset: String) {
